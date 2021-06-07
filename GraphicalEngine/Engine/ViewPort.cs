@@ -1,4 +1,5 @@
-﻿using GraphicalEngine.GameObject;
+﻿using GraphicalEngine.Components.Meshes;
+using GraphicalEngine.GameObject;
 using GraphicalEngine.Scenes;
 using System;
 using System.Numerics;
@@ -7,7 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Object = GraphicalEngine.GameObject.Object;
-using Point = GraphicalEngine.GameObject.Point;
+using Point = GraphicalEngine.Components.Meshes.Point;
 using Transform = GraphicalEngine.Components.Transform;
 
 namespace GraphicalEngine.Engine
@@ -17,46 +18,21 @@ namespace GraphicalEngine.Engine
         public bool DrawingFinished = true;
         public bool loaded = false;
         public Transform transform = new Transform();
-        public Color BackgroundColor = new Color(255, 255, 255);
-        public float maxDistance = 2000;
+        public Color BackgroundColor = new Color(0, 0, 0);
+        public static int width;
+        public static int heigth;
 
-        private byte[,] ZValues;
+        private float maxDistance = 1000;
+        private int[,] ZValues;
         private Image ImageHolder;
-        private int width;
-        private int heigth;
         
         public ViewPort(Image _ImageHolder)
         {
             ImageHolder = _ImageHolder;
             transform.rotation.X = 0;
-            transform.position.Z = -50;
+            transform.position.Z = -200;
         }
-        private void Clear(WriteableBitmap Wbitmap)
-        {
-            if (Wbitmap == null) return;
-            unsafe
-            {
-                Wbitmap.Lock();
-                IntPtr pBackBuffer = Wbitmap.BackBuffer;
-                for (int x = 0; x < width; x++)
-                {
-                    for (int y = 0; y < heigth; y++)
-                    {
-                        /*B*/
-                        *(byte*)(pBackBuffer) = 255;
-                        pBackBuffer += 1;
-                        /*G*/
-                        *(byte*)(pBackBuffer) = 255;
-                        pBackBuffer += 1;
-                        /*R*/
-                        *(byte*)(pBackBuffer) = 255;
-                        pBackBuffer += 2;
-                    }
-                }
-                Wbitmap.AddDirtyRect(new Int32Rect(0, 0, width, heigth));
-                Wbitmap.Unlock();
-            }
-        }
+
         public void ReSize(int newWidth, int newHeigth)
         {
             width = newWidth;
@@ -68,8 +44,7 @@ namespace GraphicalEngine.Engine
                 96,
                 PixelFormats.Bgr32,
                 null);
-            Clear((WriteableBitmap)ImageHolder.Source);
-            ZValues = new byte[width, heigth];
+            ZValues = new int[width, heigth];
             loaded = true;
         }
         public void DrawScene_oldV(GameScene scene)
@@ -78,9 +53,9 @@ namespace GraphicalEngine.Engine
             //Clear((WriteableBitmap)ImageHolder.Source);
             ((WriteableBitmap)ImageHolder.Source).Lock();
             IntPtr Buff = ((WriteableBitmap)ImageHolder.Source).BackBuffer;
-            Clear(((WriteableBitmap)ImageHolder.Source));
+            //Clear(((WriteableBitmap)ImageHolder.Source));
             //scene.ClearAll(Buff, width, heigth);
-            scene.DrawAll(Buff, width, heigth);
+            //scene.DrawAll(Buff, width, heigth);
             ((WriteableBitmap)ImageHolder.Source).AddDirtyRect(new Int32Rect(0, 0, width, heigth));
             ((WriteableBitmap)ImageHolder.Source).Unlock();
             DrawingFinished = true;
@@ -99,16 +74,24 @@ namespace GraphicalEngine.Engine
 
             foreach(Object gameObject in scene.gameObjects)
             {
-                foreach(Vector4 P in gameObject.getPixels())
-                {
-                        Point p = gameObject.transform.translate3Dto2D(P, width, heigth, this.transform);
-                        float zVal = gameObject.transform.getZValue(P, width, heigth, this.transform);
-                        //if (canSetZval(p.x,p.y, zVal))
-                        //{
-                            PixelOperation.putPixel(((WriteableBitmap)ImageHolder.Source).BackBuffer, width, heigth, p.x, p.y, gameObject.color);
-                            setZval(p.x, p.y, zVal);
-                        //}
-                }
+                if(!gameObject.transform.ObjectIsIn(this.transform))
+                    foreach(Triangle T in gameObject.mesh.triangles)
+                    {
+                        T.preCalculate(gameObject.transform, this.transform, width, heigth);
+                        foreach (Point p in T.getPixels())
+                        {
+                            if (belongToRect(p))
+                            {
+                                float zVal = T.getZval(p, this.transform);
+                                if (canSetZval(p.x, p.y, zVal))
+                                {
+                                    PixelOperation.putPixel(((WriteableBitmap)ImageHolder.Source).BackBuffer, width, heigth, p.x, p.y, 
+                                        scene.LightSource.getColor(gameObject.color,T.getDistance(p, scene.LightSource.transform)));
+                                    setZval(p.x, p.y, zVal);
+                                }
+                            }
+                        }
+                    }
             }
             ((WriteableBitmap)ImageHolder.Source).AddDirtyRect(new Int32Rect(0, 0, width, heigth));
             ((WriteableBitmap)ImageHolder.Source).Unlock();
@@ -117,25 +100,17 @@ namespace GraphicalEngine.Engine
 
         private void setZval(int x, int y, float z)
         {
-            byte interpolatedVal = (byte)(255*z / maxDistance);
-            if (interpolatedVal > 255)
-            {
-                interpolatedVal = 255;
-            }
-            else if (interpolatedVal < 0) interpolatedVal = 0;
             if (PixelOperation.belongToRex(width,heigth,x,y))
-             ZValues[x, y] = interpolatedVal;
+             ZValues[x, y] = (int)z;
         }
         private bool canSetZval(int x, int y, float z)
         {
-            
-            byte interpolatedVal = (byte)(255 * z / maxDistance);
-            if (interpolatedVal > 255)
-            {
-                interpolatedVal = 255;
-            }
-            else if (interpolatedVal < 0) interpolatedVal = 0;
-            return interpolatedVal<ZValues[x, y];
+            return (int)z<ZValues[x, y];
+        }
+
+        public static bool belongToRect(Point p)
+        {
+            return !(p.x <= 0 || p.y<= 0 || p.x >= width || p.y >= heigth);
         }
     }
 }

@@ -34,7 +34,7 @@ namespace GraphicalEngine.Engine
             MainViewPort = new ViewPort(_ImageHolder);
             infoFunc = _infoFunc;
             stopwatch.Start();
-            CurrentScene.Start(MainViewPort);
+            CurrentScene.Start();
         }
         float speed = 10;
         public void Update(Vector2 MoveInput, Vector2 MouseInput)

@@ -1,4 +1,5 @@
-﻿using GraphicalEngine.GameObject;
+﻿using GraphicalEngine.Components.Meshes;
+using GraphicalEngine.GameObject;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,17 +13,34 @@ namespace GraphicalEngine.Components
     {
         public Vector3 position = new Vector3(0,0,0);
         public Vector3 rotation = new Vector3(0, 0, 0);
-        public Vector3 size = new Vector3(50,50,50);
+        public Vector3 size = new Vector3(100,100,100);
         public Vector3 pivot = new Vector3(0.5f,0.5f,0.5f);
 
-
-        public Point translate3Dto2D(Vector4 v, int w, int h, Transform cameraTransform=null)
+        public bool ObjectIsIn(Transform intruder)
+        {
+            if (position.X + pivot.X * size.X >= intruder.position.X)
+            if (position.X - pivot.X * size.X <= intruder.position.X)
+            if (position.Y + pivot.Y * size.Y >= intruder.position.Y)
+            if (position.Y - pivot.Y * size.Y <= intruder.position.Y)
+            if (position.Z + pivot.Z * size.Z >= intruder.position.Z)
+            if (position.Z - pivot.Z * size.Z <= intruder.position.Z)
+            {
+                return true;
+            }
+            return false;
+        }
+        public Vector4 translate(Vector4 v)
         {
             v = Vector4.Transform(v, Rotate(RotateYMatrix(rotation.Y)));
             v = Vector4.Transform(v, Rotate(RotateXMatrix(rotation.X)));
             v = Vector4.Transform(v, Rotate(RotateZMatrix(rotation.Z)));
             v = Vector4.Transform(v, Rotate(MoveMatrix(position.X, position.Y, position.Z)));
-            if(cameraTransform!=null)
+            return v;
+        }
+        public Point translate3Dto2D(Vector4 v, int w, int h, Transform cameraTransform=null)
+        {
+            //v must be already moved and rotated
+            if (cameraTransform != null)
             {
                 v = Vector4.Transform(v, Rotate(MoveMatrix(-cameraTransform.position.X, -cameraTransform.position.Y, -cameraTransform.position.Z)));
                 v = Vector4.Transform(v, Rotate(RotateYMatrix(-cameraTransform.rotation.Y)));
@@ -30,16 +48,16 @@ namespace GraphicalEngine.Components
                 v = Vector4.Transform(v, Rotate(RotateZMatrix(-cameraTransform.rotation.Z)));
             }
             v = Vector4.Transform(v, Rotate(ProjectionMatrix(w, h)));
-
+            if (v.W!=0)
+            {
                 Vector4 Vn = new Vector4(v.X / v.W, v.Y / v.W, v.Z / v.W, 1);
                 return new Point((int)(((float)w / 2) * (1 + Vn.X)), (int)(((float)h / 2) * (1 - Vn.Y)));
+            }
+            else
+                return new Point(0, 0);
 
         }
 
-        public float getZValue(Vector4 v, int w, int h, Transform cameraTransform = null)
-        {
-            return 0;
-        }
         private Matrix4x4 ProjectionMatrix(int w, int h)
         {
             return new Matrix4x4(

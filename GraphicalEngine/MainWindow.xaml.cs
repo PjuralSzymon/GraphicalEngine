@@ -37,7 +37,7 @@ namespace GraphicalEngine
         {
             while (true)
             {
-                Thread.Sleep(TimeSpan.FromMilliseconds(70));
+                Thread.Sleep(TimeSpan.FromMilliseconds(100));
 
 
                 this.Dispatcher.BeginInvoke(new Action(() =>
@@ -48,7 +48,6 @@ namespace GraphicalEngine
                 }));
             }
         }
-
         private Vector2 AnaliseMovement()
         {
             Vector2 Movement = new Vector2(0, 0);
