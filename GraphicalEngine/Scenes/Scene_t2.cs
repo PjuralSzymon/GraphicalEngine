@@ -28,10 +28,10 @@ namespace GraphicalEngine.Scenes
             obj2.color = new Color(255, 255, 0);
             obj1.transform.position.X = -50;
             obj2.transform.position.X = 50;
+
             gameObjects.Add(obj1);
             gameObjects.Add(obj2);
             gameObjects.Add(Lpoint);
-
             foreach (Object gameobject in gameObjects)
                 gameobject.Start();
         }
@@ -41,7 +41,7 @@ namespace GraphicalEngine.Scenes
         {
             sinX += 0.1f;
             LightSource.transform.position.X = (float)(150*Math.Sin(sinX));
-            LightSource.transform.position.Y = (float)(150 * Math.Cos(sinX));
+            LightSource.transform.position.Y = (float)(150*Math.Cos(sinX));
             Lpoint.transform.position = LightSource.transform.position;
 
             obj1.transform.rotation.X += 1;

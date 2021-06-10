@@ -11,10 +11,9 @@ namespace GraphicalEngine.GameObject
     public class Object
     {
         public Color color = new Color(0, 0, 0);
-
         public Transform transform = new Transform();
-
         public Mesh mesh = new Mesh();
+
         public virtual List<Point> getPixels() { return new List<Point>(); }
         public virtual void Start( ) { }
         public virtual void Update(float deltaTime) { }

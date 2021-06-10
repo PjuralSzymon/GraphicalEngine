@@ -29,21 +29,25 @@ namespace GraphicalEngine.Engine
         public GameEngine(Image _ImageHolder,Func<String,String> _infoFunc)
         {
             //Here Scene can be change
-            CurrentScene = new Scene_t2();
+            CurrentScene = new Campfire();
 
             MainViewPort = new ViewPort(_ImageHolder);
             infoFunc = _infoFunc;
             stopwatch.Start();
             CurrentScene.Start();
         }
-        float speed = 10;
+        float cirlce = 0;
+        float R = 300;
+        Vector2 MiddlePoint = new Vector2(0, 150);
         public void Update(Vector2 MoveInput, Vector2 MouseInput)
         {
             if (MainViewPort.DrawingFinished)
             {
                 float RdeltaTime = ((float)deltaTime) / 1000;
-                //MainViewPort.transform.rotation += new Vector3(-MouseInput.Y, MouseInput.X, 0);
-                MainViewPort.transform.position += new Vector3(speed * MoveInput.Y,0, speed* MoveInput.X);
+                MainViewPort.transform.position = new Vector3(MiddlePoint.X + (float)(R * Math.Sin(cirlce)), -R, MiddlePoint.Y + (float)(-R * Math.Cos(cirlce)));
+                MainViewPort.transform.rotation = new Vector3(-45, (float)(180* cirlce/Math.PI), 0);
+                cirlce += MoveInput.Y/10;
+                R -= MoveInput.X * 10;
                 CurrentScene.Update(RdeltaTime);
                 MainViewPort.DrawScene(CurrentScene);
                 EfficientcyAnalisis();

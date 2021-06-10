@@ -29,8 +29,7 @@ namespace GraphicalEngine.Engine
         public ViewPort(Image _ImageHolder)
         {
             ImageHolder = _ImageHolder;
-            transform.rotation.X = 0;
-            transform.position.Z = -200;
+            transform.position = new Vector3(0, 0, -200);
         }
 
         public void ReSize(int newWidth, int newHeigth)
@@ -74,7 +73,6 @@ namespace GraphicalEngine.Engine
 
             foreach(Object gameObject in scene.gameObjects)
             {
-              //  if(!gameObject.transform.ObjectIsIn(this.transform))
                     foreach(Triangle T in gameObject.mesh.triangles)
                     {
                         T.preCalculate(gameObject.transform, this.transform, width, heigth);

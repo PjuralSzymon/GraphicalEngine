@@ -24,10 +24,6 @@ namespace GraphicalEngine.Components.Meshes
                 if (StableCalculation)
                     preCalcualtedPoints = calculatePixels();
                 _a = value;
-                if (_a.x < 0) _a.x = 1;
-                if (_a.y < 0) _a.y = 1;
-                if (_a.x >ViewPort.width) _a.x = ViewPort.width;
-                if (_a.y > ViewPort.heigth) _a.x = ViewPort.heigth;
             }
         }
         public Point b
@@ -39,10 +35,6 @@ namespace GraphicalEngine.Components.Meshes
                 if (StableCalculation)
                     preCalcualtedPoints = calculatePixels();
                 _b = value;
-                if (_b.x < 0) _b.x = 1;
-                if (_b.y < 0) _b.y = 1;
-                if (_b.x > ViewPort.width) _b.x = ViewPort.width;
-                if (_b.y > ViewPort.heigth) _b.x = ViewPort.heigth;
             }
         }
 
@@ -56,6 +48,12 @@ namespace GraphicalEngine.Components.Meshes
         private List<Point> calculatePixels()
         {
             List<Point> points = new List<Point>();
+
+            (a, b) = Algorithms.Liang_Barsky_Alg.LiangBarsky(
+                    a,
+                    b,
+                    ViewPort.width,
+                    ViewPort.heigth);
 
             if (b.x < a.x)
             {

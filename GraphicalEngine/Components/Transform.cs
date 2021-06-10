@@ -11,10 +11,12 @@ namespace GraphicalEngine.Components
 {
     public class Transform
     {
+        public Transform Parent = null;
         public Vector3 position = new Vector3(0,0,0);
         public Vector3 rotation = new Vector3(0, 0, 0);
         public Vector3 size = new Vector3(100,100,100);
         public Vector3 pivot = new Vector3(0.5f,0.5f,0.5f);
+
 
         public bool ObjectIsIn(Transform intruder)
         {
@@ -35,6 +37,7 @@ namespace GraphicalEngine.Components
             v = Vector4.Transform(v, Rotate(RotateXMatrix(rotation.X)));
             v = Vector4.Transform(v, Rotate(RotateZMatrix(rotation.Z)));
             v = Vector4.Transform(v, Rotate(MoveMatrix(position.X, position.Y, position.Z)));
+            if (Parent != null) v = Parent.translate(v);
             return v;
         }
         public Vector4 project(Vector4 v, int w, int h, Transform cameraTransform = null)
@@ -48,7 +51,7 @@ namespace GraphicalEngine.Components
                 v = Vector4.Transform(v, Rotate(RotateZMatrix(-cameraTransform.rotation.Z)));
             }
             v = Vector4.Transform(v, Rotate(ProjectionMatrix(w, h)));
-            if (v.W != 0)
+            if (v.W != 0 && v.Z>0)
             {
                 Vector4 Vn = new Vector4(v.X / v.W, v.Y / v.W, v.Z / v.W, 1);
                 return new Vector4((((float)w / 2) * (1 + Vn.X)), (((float)h / 2) * (1 - Vn.Y)), Vn.Z, 1);
@@ -111,7 +114,7 @@ namespace GraphicalEngine.Components
             return new Matrix4x4(
                 1, 0, 0, 0,
                 0, (float)Math.Cos(angle), -(float)Math.Sin(angle), 0,
-                0, (float)Math.Sin(angle), (float)Math.Cos(angle), 0,
+                0, (float)Math.Sin(angle),  (float)Math.Cos(angle), 0,
                 0, 0, 0, 1);
         }
 
