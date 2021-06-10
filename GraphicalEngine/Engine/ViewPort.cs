@@ -23,7 +23,7 @@ namespace GraphicalEngine.Engine
         public static int heigth;
 
         private float maxDistance = 1000;
-        private int[,] ZValues;
+        private float[,] ZValues;
         private Image ImageHolder;
         
         public ViewPort(Image _ImageHolder)
@@ -44,7 +44,7 @@ namespace GraphicalEngine.Engine
                 96,
                 PixelFormats.Bgr32,
                 null);
-            ZValues = new int[width, heigth];
+            ZValues = new float[width, heigth];
             loaded = true;
         }
         public void DrawScene_oldV(GameScene scene)
@@ -74,7 +74,7 @@ namespace GraphicalEngine.Engine
 
             foreach(Object gameObject in scene.gameObjects)
             {
-                if(!gameObject.transform.ObjectIsIn(this.transform))
+              //  if(!gameObject.transform.ObjectIsIn(this.transform))
                     foreach(Triangle T in gameObject.mesh.triangles)
                     {
                         T.preCalculate(gameObject.transform, this.transform, width, heigth);
@@ -82,12 +82,12 @@ namespace GraphicalEngine.Engine
                         {
                             if (belongToRect(p))
                             {
-                                float zVal = T.getZval(p, this.transform);
-                                if (canSetZval(p.x, p.y, zVal))
+                            //float zVal = T.getZval(p, this.transform)
+                            if (canSetZval(p.x, p.y, p.Z))
                                 {
                                     PixelOperation.putPixel(((WriteableBitmap)ImageHolder.Source).BackBuffer, width, heigth, p.x, p.y, 
                                         scene.LightSource.getColor(gameObject.color,T.getDistance(p, scene.LightSource.transform)));
-                                    setZval(p.x, p.y, zVal);
+                                    setZval(p.x, p.y, p.Z);
                                 }
                             }
                         }
@@ -100,12 +100,11 @@ namespace GraphicalEngine.Engine
 
         private void setZval(int x, int y, float z)
         {
-            if (PixelOperation.belongToRex(width,heigth,x,y))
-             ZValues[x, y] = (int)z;
+             ZValues[x, y] = z;
         }
         private bool canSetZval(int x, int y, float z)
         {
-            return (int)z<ZValues[x, y];
+            return z<ZValues[x, y];
         }
 
         public static bool belongToRect(Point p)

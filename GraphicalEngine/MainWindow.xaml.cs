@@ -37,7 +37,7 @@ namespace GraphicalEngine
         {
             while (true)
             {
-                Thread.Sleep(TimeSpan.FromMilliseconds(100));
+                Thread.Sleep(TimeSpan.FromMilliseconds(200));
 
 
                 this.Dispatcher.BeginInvoke(new Action(() =>

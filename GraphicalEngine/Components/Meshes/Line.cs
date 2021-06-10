@@ -12,8 +12,8 @@ namespace GraphicalEngine.Components.Meshes
         //If we enable this variable we will same a lot of computation power but a lot of RAM will be used
         private bool StableCalculation = false;
         private List<Point> preCalcualtedPoints = null;
-        private Point _a = new Point(0, 0);
-        private Point _b = new Point(0, 0);
+        private Point _a = new Point(0, 0,0);
+        private Point _b = new Point(0, 0,0);
 
         public Point a
         {
@@ -89,8 +89,8 @@ namespace GraphicalEngine.Components.Meshes
             double invDenom = 1 / (2 * Math.Sqrt(dx * dx + dy * dy)); //inverted denominator
             double two_dy_invDenom = 2 * dx * invDenom; //precomputed constant
 
-            points.Add(new Point(xs, ys));
-            points.Add(new Point(xf, yf));
+            points.Add(new Point(xs, ys, getZ(xs, ys, a, b)));
+            points.Add(new Point(xf, yf, getZ(xf, yf, a, b)));
             while (xs < xf)
             {
                 xs += 1;
@@ -109,8 +109,8 @@ namespace GraphicalEngine.Components.Meshes
                     ys += deltaY;
                     yf -= deltaY;
                 }
-                points.Add(new Point(xs, ys));
-                points.Add(new Point(xf, yf));
+                points.Add(new Point(xs, ys, getZ(xs, ys, a, b)));
+                points.Add(new Point(xf, yf, getZ(xf, yf, a, b)));
             }
             return points;
         }
@@ -129,8 +129,8 @@ namespace GraphicalEngine.Components.Meshes
             double invDenom = 1 / (2 * Math.Sqrt(dx * dx + dy * dy)); //inverted denominator
             double two_dy_invDenom = 2 * dy * invDenom; //precomputed constant
 
-            points.Add(new Point(xs, ys));
-            points.Add(new Point(xf, yf));
+            points.Add(new Point(xs, ys, getZ(xs, ys, a, b)));
+            points.Add(new Point(xf, yf, getZ(xf, yf, a, b)));
 
             while (deltaY * (ys - yf) < 0)
             {
@@ -150,11 +150,24 @@ namespace GraphicalEngine.Components.Meshes
                     xs += 1;
                     xf -= 1;
                 }
-                points.Add(new Point(xs, ys));
-                points.Add(new Point(xf, yf));
+                points.Add(new Point(xs, ys, getZ(xs, ys, a, b)));
+                points.Add(new Point(xf, yf, getZ(xf, yf, a, b)));
             }
 
             return points;
+        }
+
+        float getZ(int newX, int newY, Point a, Point b)
+        {
+            if (a.y > b.y)
+            {
+                Point tmp = b;
+                b = a;
+                a = tmp;
+            }
+            float t = (float)(a.distanceTo(new Point(newX, newY,0)) / a.distanceTo(b));
+            float zt = ((b.Z - a.Z) * t + a.Z);
+            return zt;
         }
 
     }

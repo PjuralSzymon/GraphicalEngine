@@ -13,10 +13,15 @@ namespace GraphicalEngine.GameObject
         public Cube()
         {
 
-            points[0, 0] = new Vector4(- transform.pivot.X * transform.size.X,
-                                       + transform.pivot.Y * transform.size.Y,
-                                       - transform.pivot.Z * transform.size.Z,
-                                       1);
+ 
+        }
+
+        public override void Start() 
+        {
+            points[0, 0] = new Vector4(-transform.pivot.X * transform.size.X,
+                            +transform.pivot.Y * transform.size.Y,
+                            -transform.pivot.Z * transform.size.Z,
+                            1);
             points[1, 0] = new Vector4(-transform.pivot.X * transform.size.X,
                                        +transform.pivot.Y * transform.size.Y,
                                        +transform.pivot.Z * transform.size.Z,
@@ -95,11 +100,6 @@ namespace GraphicalEngine.GameObject
             mesh.getTriangles()[11].A = points[3, 0];
             mesh.getTriangles()[11].B = points[0, 0];
             mesh.getTriangles()[11].C = points[0, 1];
-        }
-
-        public override void Start() 
-        { 
-
         }
 
         public override void Update(float deltaTime)

@@ -37,6 +37,27 @@ namespace GraphicalEngine.Components
             v = Vector4.Transform(v, Rotate(MoveMatrix(position.X, position.Y, position.Z)));
             return v;
         }
+        public Vector4 project(Vector4 v, int w, int h, Transform cameraTransform = null)
+        {
+            //v must be already moved and rotated
+            if (cameraTransform != null)
+            {
+                v = Vector4.Transform(v, Rotate(MoveMatrix(-cameraTransform.position.X, -cameraTransform.position.Y, -cameraTransform.position.Z)));
+                v = Vector4.Transform(v, Rotate(RotateYMatrix(-cameraTransform.rotation.Y)));
+                v = Vector4.Transform(v, Rotate(RotateXMatrix(-cameraTransform.rotation.X)));
+                v = Vector4.Transform(v, Rotate(RotateZMatrix(-cameraTransform.rotation.Z)));
+            }
+            v = Vector4.Transform(v, Rotate(ProjectionMatrix(w, h)));
+            if (v.W != 0)
+            {
+                Vector4 Vn = new Vector4(v.X / v.W, v.Y / v.W, v.Z / v.W, 1);
+                return new Vector4((((float)w / 2) * (1 + Vn.X)), (((float)h / 2) * (1 - Vn.Y)), Vn.Z, 1);
+            }
+            else
+                return new Vector4(v.X, v.Y, v.Z,1);
+
+        }
+
         public Point translate3Dto2D(Vector4 v, int w, int h, Transform cameraTransform=null)
         {
             //v must be already moved and rotated
@@ -51,10 +72,10 @@ namespace GraphicalEngine.Components
             if (v.W!=0)
             {
                 Vector4 Vn = new Vector4(v.X / v.W, v.Y / v.W, v.Z / v.W, 1);
-                return new Point((int)(((float)w / 2) * (1 + Vn.X)), (int)(((float)h / 2) * (1 - Vn.Y)));
+                return new Point((int)(((float)w / 2) * (1 + Vn.X)), (int)(((float)h / 2) * (1 - Vn.Y)),Vn.Z);
             }
             else
-                return new Point(0, 0);
+                return new Point((int)v.X, (int)v.Y, v.Z);
 
         }
 

@@ -16,6 +16,8 @@ namespace GraphicalEngine.GameObject
 
         public Color getColor(Color objColor, float distance)
         {
+            //return objColor;
+            //return objColor;
             if (distance > maxDistance || distance<0) return new Color(0, 0, 0);
             float d = distance / maxDistance;
             return new Color((byte)((float)objColor.R * (1 - d)), 

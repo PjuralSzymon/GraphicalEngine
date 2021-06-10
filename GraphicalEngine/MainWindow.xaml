@@ -12,7 +12,7 @@
                 Stretch="Uniform" 
                 Name="MainImage">
             </Image>
-            <TextBlock Name="InfoBox">
+            <TextBlock Name="InfoBox" Foreground="White" >
                 FPS: 60
             </TextBlock>
         </Grid>
