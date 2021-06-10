@@ -38,7 +38,7 @@ namespace GraphicalEngine.Engine
         }
         float cirlce = 0;
         float R = 300;
-        Vector2 MiddlePoint = new Vector2(0, 150);
+        Vector2 MiddlePoint = new Vector2(0, 0);
         public void Update(Vector2 MoveInput, Vector2 MouseInput)
         {
             if (MainViewPort.DrawingFinished)
@@ -47,7 +47,8 @@ namespace GraphicalEngine.Engine
                 MainViewPort.transform.position = new Vector3(MiddlePoint.X + (float)(R * Math.Sin(cirlce)), -R, MiddlePoint.Y + (float)(-R * Math.Cos(cirlce)));
                 MainViewPort.transform.rotation = new Vector3(-45, (float)(180* cirlce/Math.PI), 0);
                 cirlce += MoveInput.Y/10;
-                R -= MoveInput.X * 10;
+                if(!(R<220 && MoveInput.X>0))
+                    R -= MoveInput.X * 10;
                 CurrentScene.Update(RdeltaTime);
                 MainViewPort.DrawScene(CurrentScene);
                 EfficientcyAnalisis();

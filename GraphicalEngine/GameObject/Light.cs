@@ -11,7 +11,7 @@ namespace GraphicalEngine.GameObject
     public class Light
     {
         public Color color = new Color(255,255,255);
-        public float maxDistance = 500;
+        public float maxDistance = 50;
         public Transform transform = new Transform();
 
         public Color getColor(Color objColor, float distance)
